@@ -1,17 +1,29 @@
 from fastapi import APIRouter
 
-from board.repositories import MakeSession
+from sqlalchemy.orm import sessionmaker
+
+from board.repositories import engine
 from board.repositories.models import DBPost, DBUser
 
 from datetime import datetime
-from typing import Optional
 
 from board.rest.models.board import Post, ModifyPostInfo, ResPost
-from board.utils.common import make_post_list
 
 router = APIRouter()
 
 # Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine) #db 사용을 위한 session 연결
+
+class MakeSession:
+    session = None
+    #session 사용을 위한 open/close를 python context를 이용하여 설정
+
+    def __enter__(self):
+        self.session = Session()
+        return self.session
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.session.close()
 
 
 @router.get("/")
@@ -20,18 +32,17 @@ def l7ConnectionCheck():
 
 
 @router.get("/all_post")
-def getAllPost(page: Optional[int] = None):
+def getAllPost():
     with MakeSession() as session:
-        posts = session.query(DBPost)
-        if not page:
-            posts = posts.all()
-            if posts is None:
-                return 'post가 존재하지 않습니다.'
+        posts = session.query(DBPost).all()
+        if posts is None:
+            return 'post가 존재하지 않습니다.'
+        res = []
+        for post in posts:
+            name = session.query(DBUser.name).filter_by(id=post.user_id).first()
+            modify = False if post.created_at.strftime("%m/%d/%Y, %H:%M:%S") == post.updated_at.strftime("%m/%d/%Y, %H:%M:%S") else True
+            res.append(ResPost(user_name=name[0], title=post.title, content=post.content, modified=modify))
 
-        else:
-            offset = (page - 1) * 5
-            posts = posts.offset(offset).limit(5).all()
-        res = make_post_list(posts, session)
     return res
 
 @router.get("/id_posts/{user_id}")
@@ -48,7 +59,6 @@ def getPostById(user_id: int):
             res.append(ResPost(user_name=name[0], title=post.title, content=post.content, modified=modify))
 
     return res
-
 
 
 @router.post("/upload_post")

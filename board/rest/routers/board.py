@@ -44,8 +44,6 @@ def getPostById(user_id: int):
 
     return res
 
-
-
 @router.post("/upload_post")
 def uploadPost(post: Post):
     # Base.metadata.create_all(engine)

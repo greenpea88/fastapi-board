@@ -1,13 +1,19 @@
 from fastapi import APIRouter
 
 from board.repositories import MakeSession
-from board.repositories.models import DBPost, DBUser
+from board.repositories.models import DBPost
+
+from board.rest.routers.common import get_response
+
+from board.usecases.board import PostListUseCase
+
+from board.req_objs.board import PostListReqObj
 
 from datetime import datetime
 from typing import Optional
 
-from board.rest.models.board import Post, ModifyPostInfo, ResPost
-from board.utils.common import make_post_list
+from board.rest.models.board import Post, ModifyPostInfo
+from board.rest.routers.common import make_post_list
 
 router = APIRouter()
 
@@ -21,6 +27,12 @@ def l7ConnectionCheck():
 
 @router.get("/all_post")
 def getAllPost(page: Optional[int] = None):
+    request_params = {
+        'page': page,
+        'user_id': None
+    }
+    test_res = get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
+    print(f'test_res : {test_res}')
     with MakeSession() as session:
         posts = session.query(DBPost)
         if not page:
@@ -33,9 +45,15 @@ def getAllPost(page: Optional[int] = None):
             posts = posts.offset(offset).limit(5).all()
         res = make_post_list(posts, session)
     return res
+    # return get_response(page)
 
 @router.get("/id_posts/{user_id}")
 def getPostById(user_id: int):
+    # request_params = {
+    #     'page': None,
+    #     'user_id': user_id
+    # }
+    # get_response(PostListUseCase, PostListReqObj.from_dict(request_params))
     with MakeSession() as session:
         posts = session.query(DBPost).filter_by(user_id=user_id).all()
         if posts is None:

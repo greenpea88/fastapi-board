@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from board.usecases import BaseUseCase
 
 from board.repositories import MakeSession
@@ -42,4 +44,25 @@ class PostCreateUseCase(BaseUseCase):
             new_post.content = req_obj['content']
 
             session.add(new_post)
+            session.commit()
+
+class PostModifyUseCase(BaseUseCase):
+    def process_request(self, req_obj):
+        req_obj = req_obj.to_dict()
+
+        with MakeSession() as session:
+            post = session.query(DBPost).filter_by(id=req_obj['post_id']).first()
+
+            # if req_obj['info']['title'] != None:
+            #     post.title = req_obj['info']['title']
+            # if req_obj['info']['content'] != None:
+            #     post.content = req_obj['info']['content']
+
+            if req_obj['title'] != None:
+                post.title = req_obj['title']
+            if req_obj['content'] != None:
+                post.content = req_obj['content']
+
+            post.update_at = datetime.utcnow()
+            session.add(post)
             session.commit()

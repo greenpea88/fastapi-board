@@ -5,9 +5,9 @@ from board.repositories.models import DBPost
 
 from board.rest.routers.common import get_response
 
-from board.usecases.board import PostListUseCase, PostCreateUseCase
+from board.usecases.board import PostListUseCase, PostCreateUseCase, PostModifyUseCase
 
-from board.req_objs.board import PostListReqObj, PostCreateReqObj
+from board.req_objs.board import PostListReqObj, PostCreateReqObj, PostModifyReqObj
 
 from datetime import datetime
 from typing import Optional
@@ -47,15 +47,21 @@ def uploadPost(post: Post):
 
 @router.put('/modify_post')
 def modifyPost(post_id: int, info: ModifyPostInfo):
+    request_params = {
+        'post_id': post_id,
+        'title': info.title,
+        'content': info.content
+    }
 
-    with MakeSession() as session:
-        post = session.query(DBPost).filter_by(id=post_id).first()
-
-        if info.title != None:
-            post.title = info.title
-        if info.content != None:
-            post.content = info.content
-
-        post.updated_at = datetime.utcnow()
-        session.add(post)
-        session.commit()
+    get_response(PostModifyUseCase(), PostModifyReqObj.from_dict(**request_params))
+    # with MakeSession() as session:
+    #     post = session.query(DBPost).filter_by(id=post_id).first()
+    #
+    #     if info.title != None:
+    #         post.title = info.title
+    #     if info.content != None:
+    #         post.content = info.content
+    #
+    #     post.updated_at = datetime.utcnow()
+    #     session.add(post)
+    #     session.commit()

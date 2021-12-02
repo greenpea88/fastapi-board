@@ -16,3 +16,9 @@ class PostCreateReqObj(ValidReqObj):
     user_id: int
     title: str
     content: str
+
+@dataclass()
+class PostModifyReqObj(ValidReqObj):
+    post_id: int
+    title: str
+    content: str

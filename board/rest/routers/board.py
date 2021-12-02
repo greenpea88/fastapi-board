@@ -5,9 +5,9 @@ from board.repositories.models import DBPost
 
 from board.rest.routers.common import get_response
 
-from board.usecases.board import PostListUseCase
+from board.usecases.board import PostListUseCase, PostCreateUseCase
 
-from board.req_objs.board import PostListReqObj
+from board.req_objs.board import PostListReqObj, PostCreateReqObj
 
 from datetime import datetime
 from typing import Optional
@@ -39,25 +39,29 @@ def getPostById(user_id: int):
         'page': None,
         'user_id': user_id
     }
-    return get_response(PostListUseCase(), PostListReqObj.from_dict(request_params))
+    return get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
 
 @router.post("/upload_post")
 def uploadPost(post: Post):
     # Base.metadata.create_all(engine)
-
-    #post한 내용 등록
-    with MakeSession() as session:
-        new_post = DBPost()
-        new_post.user_id = post.user_id
-        new_post.title = post.title
-        new_post.content = post.content
-
-        session.add(new_post)
-        session.commit()
-
-        result = session.query(DBPost).all()
-
-    return result
+    request_params = {
+        'user_id': post.user_id,
+        'title': post.title,
+        'content': post.content
+    }
+    get_response(PostCreateUseCase(), PostCreateReqObj.from_dict(**request_params))
+    # with MakeSession() as session:
+    #     new_post = DBPost()
+    #     new_post.user_id = post.user_id
+    #     new_post.title = post.title
+    #     new_post.content = post.content
+    #
+    #     session.add(new_post)
+    #     session.commit()
+    #
+    #     result = session.query(DBPost).all()
+    #
+    # return result
 
 @router.put('/modify_post')
 def modifyPost(post_id: int, info: ModifyPostInfo):

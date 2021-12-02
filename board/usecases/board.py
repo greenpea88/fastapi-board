@@ -9,7 +9,6 @@ class PostListUseCase(BaseUseCase):
         # posts = self.repo
         # 일단은 DBPost로 넣었는데 이 값을 이제 req_obj로 변경해야함
         #   >> 세션 관련 작업은 repo로 빼줘야할 필요가 있음
-
         req_obj = req_obj.to_dict()
 
         with MakeSession() as session:
@@ -33,4 +32,14 @@ class PostListUseCase(BaseUseCase):
 
 class PostCreateUseCase(BaseUseCase):
     def process_request(self, req_obj):
-        pass
+        #이 값을 repo에 넘겨줘야하는 값임(?)
+        req_obj = req_obj.to_dict()
+        # post한 내용 등록
+        with MakeSession() as session:
+            new_post = DBPost()
+            new_post.user_id = req_obj['user_id']
+            new_post.title = req_obj['title']
+            new_post.content = req_obj['content']
+
+            session.add(new_post)
+            session.commit()

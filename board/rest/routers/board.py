@@ -25,7 +25,7 @@ def l7ConnectionCheck():
     return "success"
 
 
-@router.get("/all_posts/")
+@router.get("/all_posts")
 def getAllPost(page: Optional[int] = None):
     request_params = {
         'page': page,
@@ -33,7 +33,7 @@ def getAllPost(page: Optional[int] = None):
     }
     return get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
 
-@router.get("/id_posts/")
+@router.get("/id_posts")
 def getPostById(user_id: int):
     request_params = {
         'page': None,

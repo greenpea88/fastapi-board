@@ -7,9 +7,11 @@ class ValidReqObj:
 
     @classmethod
     #req obj를 만드는 factory 함수
-    def from_dict(cls, adict):
+    def from_dict(cls, adict = None, **kwarg):
         #dictionary로부터 entity?
-        return cls
+        if adict is None:
+            adict = kwarg
+        return cls(**adict)
 
     def to_dict(self):
         #entity로부터 dictionary?

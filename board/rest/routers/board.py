@@ -27,19 +27,13 @@ def l7ConnectionCheck():
 
 @router.get("/all_posts")
 def getAllPost(page: Optional[int] = None):
-    request_params = {
-        'page': page,
-        'user_id': None
-    }
-    return get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
+
+    return get_response(PostListUseCase(), PostListReqObj.from_dict(page=page))
 
 @router.get("/id_posts")
 def getPostById(user_id: int):
-    request_params = {
-        'page': None,
-        'user_id': user_id
-    }
-    return get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
+
+    return get_response(PostListUseCase(), PostListReqObj.from_dict(user_id=user_id))
 
 @router.post("/upload_post")
 def uploadPost(post: Post):
@@ -50,18 +44,6 @@ def uploadPost(post: Post):
         'content': post.content
     }
     get_response(PostCreateUseCase(), PostCreateReqObj.from_dict(**request_params))
-    # with MakeSession() as session:
-    #     new_post = DBPost()
-    #     new_post.user_id = post.user_id
-    #     new_post.title = post.title
-    #     new_post.content = post.content
-    #
-    #     session.add(new_post)
-    #     session.commit()
-    #
-    #     result = session.query(DBPost).all()
-    #
-    # return result
 
 @router.put('/modify_post')
 def modifyPost(post_id: int, info: ModifyPostInfo):

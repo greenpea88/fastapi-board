@@ -4,7 +4,7 @@
 class ValidReqObj:
     #유효한 request obj
     # schema = NotImplemented
-
+    # validation 추가 필요
     @classmethod
     #req obj를 만드는 factory 함수
     def from_dict(cls, adict = None, **kwarg):

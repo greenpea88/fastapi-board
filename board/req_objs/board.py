@@ -4,8 +4,8 @@ from board.req_objs import ValidReqObj
 
 @dataclass
 class PostListReqObj(ValidReqObj):
-    page: int
-    user_id: int
+    page: int = None
+    user_id: int = None
 
     # schema = {
     #

@@ -17,11 +17,12 @@ class PostListUseCase(BaseUseCase):
             # 1. user_id 값이 있는 경우
             if req_obj['user_id'] is not None:
                 posts = query.filter_by(user_id=req_obj['user_id']).all()
-
+                if not posts:
+                    return 'post가 존재하지 않습니다.'
             else:
                 if not req_obj['page']:
-                    query = query.all()
-                    if query is None:
+                    posts = query.all()
+                    if not posts:
                         return 'post is not exist'
                 # 2. pagination이 필요한 경우
                 else:

@@ -31,36 +31,15 @@ def getAllPost(page: Optional[int] = None):
         'page': page,
         'user_id': None
     }
-    test_res = get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
-    print(f'test_res : {test_res}')
-    with MakeSession() as session:
-        posts = session.query(DBPost)
-        if not page:
-            posts = posts.all()
-            if posts is None:
-                return 'post가 존재하지 않습니다.'
-
-        else:
-            offset = (page - 1) * 5
-            posts = posts.offset(offset).limit(5).all()
-        res = make_post_list(posts, session)
-    return res
-    # return get_response(page)
+    return get_response(PostListUseCase(), PostListReqObj.from_dict(**request_params))
 
 @router.get("/id_posts/{user_id}")
 def getPostById(user_id: int):
-    # request_params = {
-    #     'page': None,
-    #     'user_id': user_id
-    # }
-    # get_response(PostListUseCase, PostListReqObj.from_dict(request_params))
-    with MakeSession() as session:
-        posts = session.query(DBPost).filter_by(user_id=user_id).all()
-        if posts is None:
-            return 'post가 존재하지 않습니다.'
-        res = make_post_list(posts, session)
-
-    return res
+    request_params = {
+        'page': None,
+        'user_id': user_id
+    }
+    return get_response(PostListUseCase(), PostListReqObj.from_dict(request_params))
 
 @router.post("/upload_post")
 def uploadPost(post: Post):

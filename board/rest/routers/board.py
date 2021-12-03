@@ -26,6 +26,7 @@ def getAllPost(
         repo: BaseRepo = Depends(get_post_repository)
     ):
 
+    #특정 format(entity)를 통해 받은 정보들은 unwrapping하여서 전달해줌
     return get_response(PostListUseCase(repo=repo),
                         PostListReqObj.from_dict(page=page))
 

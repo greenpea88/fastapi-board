@@ -8,7 +8,7 @@ def res_to_model(res_mode, res):
 
 def get_response(usecase: BaseUseCase, req_obj: ValidReqObj):
     #router로부터 받은 req model을 받아서 usecase가 실행하도록 넘겨줌
-    print(req_obj)
+    # print(req_obj)
     res = usecase.execute(req_obj=req_obj) #entity의 형태로 받음
     return res
     # return res_to_model()

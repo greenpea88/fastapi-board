@@ -79,16 +79,17 @@ class BaseRepo:
             if user_id:
                 posts = query.filter(self.model.id==user_id).all()
             if page:
-                offset = (page - 1) * 5
-                posts = query.offset(offset).limit(5).all()
+                self.paginate(page)
             if not posts:
                 return None
 
             return [post for post in posts]
 
 
-    def paginate(self, page = None):
-        pass
+    def paginate(self, query, page = None):
+        offset = (page - 1) * 5
+        posts = query.offset(offset).limit(5).all()
+        return posts
 
     def create(self):
         pass

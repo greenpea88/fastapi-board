@@ -35,3 +35,13 @@ class DBPost(Base, ToEntity):
     user = relationship('DBUser') #실제 DB 칼럼으로 존재하는 변수 아님 -> 코드 상에서 쉽게 접근하기 위해 설정
 
     entity = PostInfo
+
+    def to_entity(self):
+        return self.entity.from_dict(
+            {
+                "user_name": self.user.name,
+                "title": self.title,
+                "content": self.content,
+                "updated_at": self.updated_at.strftime("%m/%d/%Y, %H:%M:%S")
+            }
+        )

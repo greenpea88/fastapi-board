@@ -1,25 +1,24 @@
 #use case에 전달할 때 사용할 req obj에 대한 기본 설정
 #data에 대한 검증이 필요함
+from dataclasses import asdict
 
-class ValidReqObj:
+from board.utils import FromDict
+
+
+class ValidReqObj(FromDict):
     #유효한 request obj
     # schema = NotImplemented
     # validation 추가 필요
-    @classmethod
-    #req obj를 만드는 factory 함수
-    def from_dict(cls, adict = None, **kwarg):
-        #dictionary로부터 entity?
-        if adict is None:
-            adict = kwarg
-        return cls(**adict)
 
+    # @classmethod
     def to_dict(self):
         #entity로부터 dictionary?
-        new_dict = {}
-        for key in self.__annotations__.keys():
-            value = getattr(self, key, None)
-            new_dict[key] = value
-
+        # new_dict = {}
+        new_dict = asdict(self)
+        # for key in self.__annotations__.keys():
+        #     value = getattr(self, key, None)
+        #     print(f'key {key} value {value}')
+        #     new_dict[key] = value
         return new_dict
 
 

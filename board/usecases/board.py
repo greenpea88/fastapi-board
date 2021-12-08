@@ -2,7 +2,7 @@ from datetime import datetime
 
 from board.usecases import BaseUseCase
 
-from board.repositories import MakeSession
+# from board.repositories import MakeSession
 from board.repositories.models import DBPost
 # from board.rest.routers.common import make_post_list
 
@@ -13,7 +13,7 @@ class PostListUseCase(BaseUseCase):
         # 일단은 DBPost로 넣었는데 이 값을 이제 req_obj로 변경해야함
         #   >> 세션 관련 작업은 repo로 빼줘야할 필요가 있음
         # req_obj = req_obj.to_dict()
-        self.repo.get(**req_obj.to_dict())
+        res = self.repo.get(**req_obj.to_dict())
 
         # if req_obj['user_id'] is not None:
         #
@@ -34,7 +34,7 @@ class PostListUseCase(BaseUseCase):
         #             offset = (req_obj['page'] - 1) * 5
         #             posts = query.offset(offset).limit(5).all()
         # res = make_post_list(posts, session)
-        # return res
+        return res
 
 class PostCreateUseCase(BaseUseCase):
     def process_request(self, req_obj):

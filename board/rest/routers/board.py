@@ -1,13 +1,14 @@
-from fastapi import APIRouter
-
-from board.repositories import MakeSession
-from board.repositories.models import DBPost, DBUser
-
-from datetime import datetime
+from fastapi import APIRouter, Depends
 from typing import Optional
 
-from board.rest.models.board import Post, ModifyPostInfo, ResPost
-from board.utils.common import make_post_list
+from board.repositories import BaseRepo
+from board.rest.repo import get_post_repository
+from board.rest.routers.common import get_response
+from board.rest.models.board import Post, ModifyPostInfo
+
+from board.usecases.board import PostListUseCase, PostCreateUseCase, PostModifyUseCase
+
+from board.req_objs.board import PostListReqObj, PostCreateReqObj, PostModifyReqObj
 
 router = APIRouter()
 
@@ -19,60 +20,48 @@ def l7ConnectionCheck():
     return "success"
 
 
-@router.get("/all_post")
-def getAllPost(page: Optional[int] = None):
-    with MakeSession() as session:
-        posts = session.query(DBPost)
-        if not page:
-            posts = posts.all()
-            if posts is None:
-                return 'post가 존재하지 않습니다.'
+@router.get("/all_posts")
+def getAllPost(
+        page: Optional[int] = None,
+        repo: BaseRepo = Depends(get_post_repository)
+    ):
+    #특정 format(entity)를 통해 받은 정보들은 unwrapping하여서 전달해줌
+    return get_response(PostListUseCase(repo=repo),
+                        PostListReqObj.from_dict(page=page))
 
-        else:
-            offset = (page - 1) * 5
-            posts = posts.offset(offset).limit(5).all()
-        res = make_post_list(posts, session)
-    return res
+@router.get("/id_posts")
+def getPostById(
+        user_id: int,
+        repo: BaseRepo = Depends(get_post_repository)
+    ):
 
-@router.get("/id_posts/{user_id}")
-def getPostById(user_id: int):
-    with MakeSession() as session:
-        posts = session.query(DBPost).filter_by(user_id=user_id).all()
-        if posts is None:
-            return 'post가 존재하지 않습니다.'
-        res = make_post_list(posts, session)
-
-    return res
+    return get_response(PostListUseCase(repo=repo),
+                        PostListReqObj.from_dict(user_id=user_id))
 
 @router.post("/upload_post")
-def uploadPost(post: Post):
+def uploadPost(
+        post: Post,
+        repo: BaseRepo = Depends(get_post_repository)
+    ):
     # Base.metadata.create_all(engine)
-
-    #post한 내용 등록
-    with MakeSession() as session:
-        new_post = DBPost()
-        new_post.user_id = post.user_id
-        new_post.title = post.title
-        new_post.content = post.content
-
-        session.add(new_post)
-        session.commit()
-
-        result = session.query(DBPost).all()
-
-    return result
+    request_params = {
+        'user_id': post.user_id,
+        'title': post.title,
+        'content': post.content
+    }
+    get_response(PostCreateUseCase(repo=repo),
+                 PostCreateReqObj.from_dict(**request_params))
 
 @router.put('/modify_post')
-def modifyPost(post_id: int, info: ModifyPostInfo):
+def modifyPost(
+        post_id: int, info: ModifyPostInfo,
+        repo: BaseRepo = Depends(get_post_repository)
+    ):
+    request_params = {
+        'post_id': post_id,
+        'title': info.title,
+        'content': info.content
+    }
 
-    with MakeSession() as session:
-        post = session.query(DBPost).filter_by(id=post_id).first()
-
-        if info.title != None:
-            post.title = info.title
-        if info.content != None:
-            post.content = info.content
-
-        post.updated_at = datetime.utcnow()
-        session.add(post)
-        session.commit()
+    get_response(PostModifyUseCase(repo=repo),
+                 PostModifyReqObj.from_dict(**request_params))

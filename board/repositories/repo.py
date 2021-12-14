@@ -19,8 +19,6 @@ class PostRepository(BaseRepo):
             for post in posts:
                 print(post.user)
 
-        # for post in posts:
-        #     print(post.to_entity())
         return [post.to_entity() for post in posts]
         # return posts
 

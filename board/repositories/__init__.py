@@ -31,7 +31,7 @@ from board.repositories.base import Base
 #         self.session.close()
 
 class BaseRepo:
-    #DB에 접근하는 model type -> DBPost, DBUser
+    # DB에 접근하는 model type -> DBPost, DBUser
     model: Base = NotImplemented
 
     def __init__(self):

@@ -5,13 +5,13 @@ from typing import List
 # from board.rest.models.board import ResPost
 
 class FromDict:
+
     @classmethod
     # req obj를 만드는 factory 함수
     def from_dict(cls, adict=None, **kwarg):
         # dict로부터 entity
         if adict is None:
             adict = kwarg
-        print(f'adict : {adict}')
         return cls(**adict)
 
 class ToEntity:
